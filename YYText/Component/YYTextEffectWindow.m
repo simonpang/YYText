@@ -17,18 +17,17 @@
 
 @implementation YYTextEffectWindow
 
+static YYTextEffectWindow *one = nil;
+
 + (instancetype)sharedWindow {
-    static YYTextEffectWindow *one = nil;
-    if (one == nil) {
-        // iOS 9 compatible
-        NSString *mode = [NSRunLoop currentRunLoop].currentMode;
-        if (mode.length == 27 &&
-            [mode hasPrefix:@"UI"] &&
-            [mode hasSuffix:@"InitializationRunLoopMode"]) {
-            return nil;
-        }
+    if (!one) {
+        // Simple hack to prevent crash on app startup
+        [[YYTextEffectWindow class] performSelector:@selector(makeShareWindow) withObject:nil afterDelay:0.5];
     }
-    
+    return one;
+}
+
++ (instancetype)makeShareWindow {
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
         if (!YYTextIsAppExtension()) {
