@@ -35,7 +35,6 @@
 		D91054D41F3735E50007F224 /* YYTextTransaction.m in Sources */ = {isa = PBXBuildFile; fileRef = D91054B71F3735E50007F224 /* YYTextTransaction.m */; };
 		D91054D51F3735E50007F224 /* YYTextUtilities.m in Sources */ = {isa = PBXBuildFile; fileRef = D91054B91F3735E50007F224 /* YYTextUtilities.m */; };
 		D91054D61F3735E50007F224 /* YYTextWeakProxy.m in Sources */ = {isa = PBXBuildFile; fileRef = D91054BB1F3735E50007F224 /* YYTextWeakProxy.m */; };
-		D91054D71F3735E50007F224 /* YYLabel.m in Sources */ = {isa = PBXBuildFile; fileRef = D91054BD1F3735E50007F224 /* YYLabel.m */; };
 		D91054D81F3735E50007F224 /* YYTextView.m in Sources */ = {isa = PBXBuildFile; fileRef = D91054C01F3735E50007F224 /* YYTextView.m */; };
 		D91054DD1F3736060007F224 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = D91054DA1F3736060007F224 /* AppDelegate.m */; };
 		D91054DE1F3736060007F224 /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = D91054DC1F3736060007F224 /* ViewController.m */; };
@@ -133,8 +132,6 @@
 		D91054B91F3735E50007F224 /* YYTextUtilities.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = YYTextUtilities.m; sourceTree = "<group>"; };
 		D91054BA1F3735E50007F224 /* YYTextWeakProxy.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = YYTextWeakProxy.h; sourceTree = "<group>"; };
 		D91054BB1F3735E50007F224 /* YYTextWeakProxy.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = YYTextWeakProxy.m; sourceTree = "<group>"; };
-		D91054BC1F3735E50007F224 /* YYLabel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = YYLabel.h; sourceTree = "<group>"; };
-		D91054BD1F3735E50007F224 /* YYLabel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = YYLabel.m; sourceTree = "<group>"; };
 		D91054BE1F3735E50007F224 /* YYText.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = YYText.h; sourceTree = "<group>"; };
 		D91054BF1F3735E50007F224 /* YYTextView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = YYTextView.h; sourceTree = "<group>"; };
 		D91054C01F3735E50007F224 /* YYTextView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = YYTextView.m; sourceTree = "<group>"; };
@@ -254,8 +251,6 @@
 				D910548D1F3735E50007F224 /* Component */,
 				D91054A01F3735E50007F224 /* String */,
 				D91054AB1F3735E50007F224 /* Utility */,
-				D91054BC1F3735E50007F224 /* YYLabel.h */,
-				D91054BD1F3735E50007F224 /* YYLabel.m */,
 				D91054BE1F3735E50007F224 /* YYText.h */,
 				D91054BF1F3735E50007F224 /* YYTextView.h */,
 				D91054C01F3735E50007F224 /* YYTextView.m */,
@@ -534,7 +529,6 @@
 				D91054D01F3735E50007F224 /* NSParagraphStyle+YYText.m in Sources */,
 				D91054FD1F3736700007F224 /* UIView+YYAdd.m in Sources */,
 				D91054D51F3735E50007F224 /* YYTextUtilities.m in Sources */,
-				D91054D71F3735E50007F224 /* YYLabel.m in Sources */,
 				D91054CC1F3735E50007F224 /* YYTextParser.m in Sources */,
 				D91055221F37367B0007F224 /* YYTextExample.m in Sources */,
 				D91054F81F3736700007F224 /* NSData+YYAdd.m in Sources */,
