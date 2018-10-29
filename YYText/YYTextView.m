@@ -37,20 +37,8 @@ static double _YYDeviceSystemVersion() {
 #define kSystemVersion _YYDeviceSystemVersion()
 #endif
 
-#ifndef kiOS6Later
-#define kiOS6Later (kSystemVersion >= 6)
-#endif
-
-#ifndef kiOS7Later
-#define kiOS7Later (kSystemVersion >= 7)
-#endif
-
-#ifndef kiOS8Later
-#define kiOS8Later (kSystemVersion >= 8)
-#endif
-
-#ifndef kiOS9Later
-#define kiOS9Later (kSystemVersion >= 9)
+#ifndef kiOS12Later
+#define kiOS12Later (kSystemVersion >= 12)
 #endif
 
 
@@ -751,11 +739,7 @@ typedef NS_ENUM(NSUInteger, YYTextMoveDirection) {
                     newInset.bottom = inter.size.height + extend;
                     newIndicatorInsets.bottom = newInset.bottom;
                     UIViewAnimationOptions curve;
-                    if (kiOS7Later) {
-                        curve = 7 << 16;
-                    } else {
-                        curve = UIViewAnimationOptionCurveEaseInOut;
-                    }
+                    curve = 7 << 16;
                     [UIView animateWithDuration:0.25 delay:0 options:UIViewAnimationOptionBeginFromCurrentState | UIViewAnimationOptionAllowUserInteraction | curve animations:^{
                         [super setContentInset:newInset];
                         [super setScrollIndicatorInsets:newIndicatorInsets];
@@ -1686,63 +1670,39 @@ typedef NS_ENUM(NSUInteger, YYTextMoveDirection) {
     UIViewController *ctrl = [self _getRootViewController];
     
     if (canUndo && canRedo) {
-        if (kiOS8Later) {
-            UIAlertController *alert = [UIAlertController alertControllerWithTitle:strings[4] message:@"" preferredStyle:UIAlertControllerStyleAlert];
-            [alert addAction:[UIAlertAction actionWithTitle:strings[3] style:UIAlertActionStyleDefault handler:^(UIAlertAction *action) {
-                [_self _undo];
-                [_self _restoreFirstResponderAfterUndoAlert];
-            }]];
-            [alert addAction:[UIAlertAction actionWithTitle:strings[2] style:UIAlertActionStyleDefault handler:^(UIAlertAction *action) {
-                [_self _redo];
-                [_self _restoreFirstResponderAfterUndoAlert];
-            }]];
-            [alert addAction:[UIAlertAction actionWithTitle:strings[0] style:UIAlertActionStyleCancel handler:^(UIAlertAction *action) {
-                [_self _restoreFirstResponderAfterUndoAlert];
-            }]];
-            [ctrl presentViewController:alert animated:YES completion:nil];
-        } else {
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wdeprecated-declarations"
-            UIAlertView *alert = [[UIAlertView alloc] initWithTitle:strings[4] message:@"" delegate:self cancelButtonTitle:strings[0] otherButtonTitles:strings[3], strings[2], nil];
-            [alert show];
-#pragma clang diagnostic pop
-        }
+        UIAlertController *alert = [UIAlertController alertControllerWithTitle:strings[4] message:@"" preferredStyle:UIAlertControllerStyleAlert];
+        [alert addAction:[UIAlertAction actionWithTitle:strings[3] style:UIAlertActionStyleDefault handler:^(UIAlertAction *action) {
+            [_self _undo];
+            [_self _restoreFirstResponderAfterUndoAlert];
+        }]];
+        [alert addAction:[UIAlertAction actionWithTitle:strings[2] style:UIAlertActionStyleDefault handler:^(UIAlertAction *action) {
+            [_self _redo];
+            [_self _restoreFirstResponderAfterUndoAlert];
+        }]];
+        [alert addAction:[UIAlertAction actionWithTitle:strings[0] style:UIAlertActionStyleCancel handler:^(UIAlertAction *action) {
+            [_self _restoreFirstResponderAfterUndoAlert];
+        }]];
+        [ctrl presentViewController:alert animated:YES completion:nil];
     } else if (canUndo) {
-        if (kiOS8Later) {
-            UIAlertController *alert = [UIAlertController alertControllerWithTitle:strings[4] message:@"" preferredStyle:UIAlertControllerStyleAlert];
-            [alert addAction:[UIAlertAction actionWithTitle:strings[3] style:UIAlertActionStyleDefault handler:^(UIAlertAction *action) {
-                [_self _undo];
-                [_self _restoreFirstResponderAfterUndoAlert];
-            }]];
-            [alert addAction:[UIAlertAction actionWithTitle:strings[0] style:UIAlertActionStyleCancel handler:^(UIAlertAction *action) {
-                [_self _restoreFirstResponderAfterUndoAlert];
-            }]];
-            [ctrl presentViewController:alert animated:YES completion:nil];
-        } else {
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wdeprecated-declarations"
-            UIAlertView *alert = [[UIAlertView alloc] initWithTitle:strings[4] message:@"" delegate:self cancelButtonTitle:strings[0] otherButtonTitles:strings[3], nil];
-            [alert show];
-#pragma clang diagnostic pop
-        }
+        UIAlertController *alert = [UIAlertController alertControllerWithTitle:strings[4] message:@"" preferredStyle:UIAlertControllerStyleAlert];
+        [alert addAction:[UIAlertAction actionWithTitle:strings[3] style:UIAlertActionStyleDefault handler:^(UIAlertAction *action) {
+            [_self _undo];
+            [_self _restoreFirstResponderAfterUndoAlert];
+        }]];
+        [alert addAction:[UIAlertAction actionWithTitle:strings[0] style:UIAlertActionStyleCancel handler:^(UIAlertAction *action) {
+            [_self _restoreFirstResponderAfterUndoAlert];
+        }]];
+        [ctrl presentViewController:alert animated:YES completion:nil];
     } else if (canRedo) {
-        if (kiOS8Later) {
-            UIAlertController *alert = [UIAlertController alertControllerWithTitle:strings[2] message:@"" preferredStyle:UIAlertControllerStyleAlert];
-            [alert addAction:[UIAlertAction actionWithTitle:strings[1] style:UIAlertActionStyleDefault handler:^(UIAlertAction *action) {
-                [_self _redo];
-                [_self _restoreFirstResponderAfterUndoAlert];
-            }]];
-            [alert addAction:[UIAlertAction actionWithTitle:strings[0] style:UIAlertActionStyleCancel handler:^(UIAlertAction *action) {
-                [_self _restoreFirstResponderAfterUndoAlert];
-            }]];
-            [ctrl presentViewController:alert animated:YES completion:nil];
-        } else {
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wdeprecated-declarations"
-            UIAlertView *alert = [[UIAlertView alloc] initWithTitle:strings[2] message:@"" delegate:self cancelButtonTitle:strings[0] otherButtonTitles:strings[1], nil];
-            [alert show];
-#pragma clang diagnostic pop
-        }
+        UIAlertController *alert = [UIAlertController alertControllerWithTitle:strings[2] message:@"" preferredStyle:UIAlertControllerStyleAlert];
+        [alert addAction:[UIAlertAction actionWithTitle:strings[1] style:UIAlertActionStyleDefault handler:^(UIAlertAction *action) {
+            [_self _redo];
+            [_self _restoreFirstResponderAfterUndoAlert];
+        }]];
+        [alert addAction:[UIAlertAction actionWithTitle:strings[0] style:UIAlertActionStyleCancel handler:^(UIAlertAction *action) {
+            [_self _restoreFirstResponderAfterUndoAlert];
+        }]];
+        [ctrl presentViewController:alert animated:YES completion:nil];
     }
 }
 #endif
