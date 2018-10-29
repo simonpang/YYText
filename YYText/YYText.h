@@ -14,7 +14,6 @@
 #if __has_include(<YYText/YYText.h>)
 FOUNDATION_EXPORT double YYTextVersionNumber;
 FOUNDATION_EXPORT const unsigned char YYTextVersionString[];
-#import <YYText/YYLabel.h>
 #import <YYText/YYTextView.h>
 #import <YYText/YYTextAttribute.h>
 #import <YYText/YYTextArchiver.h>
@@ -31,7 +30,6 @@ FOUNDATION_EXPORT const unsigned char YYTextVersionString[];
 #import <YYText/NSParagraphStyle+YYText.h>
 #import <YYText/UIPasteboard+YYText.h>
 #else
-#import "YYLabel.h"
 #import "YYTextView.h"
 #import "YYTextAttribute.h"
 #import "YYTextArchiver.h"
