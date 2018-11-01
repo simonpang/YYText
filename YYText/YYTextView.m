@@ -199,12 +199,8 @@ typedef NS_ENUM(NSUInteger, YYTextMoveDirection) {
 
 /// Update layout and selection before runloop sleep/end.
 - (void)_commitUpdate {
-#if !TARGET_INTERFACE_BUILDER
     _state.needUpdate = YES;
     [[YYTextTransaction transactionWithTarget:self selector:@selector(_updateIfNeeded)] commit];
-#else
-    [self _update];
-#endif
 }
 
 /// Update layout and selection view if needed.
