@@ -317,12 +317,8 @@ typedef NS_ENUM(NSUInteger, YYTextMoveDirection) {
 
 /// Update placeholder before runloop sleep/end.
 - (void)_commitPlaceholderUpdate {
-#if !TARGET_INTERFACE_BUILDER
     _state.placeholderNeedUpdate = YES;
     [[YYTextTransaction transactionWithTarget:self selector:@selector(_updatePlaceholderIfNeeded)] commit];
-#else
-    [self _updatePlaceholder];
-#endif
 }
 
 /// Update placeholder if needed.
