@@ -23,26 +23,6 @@
 #import "UIPasteboard+YYText.h"
 #import "UIView+YYText.h"
 
-
-static double _YYDeviceSystemVersion() {
-    static double version;
-    static dispatch_once_t onceToken;
-    dispatch_once(&onceToken, ^{
-        version = [UIDevice currentDevice].systemVersion.doubleValue;
-    });
-    return version;
-}
-
-#ifndef kSystemVersion
-#define kSystemVersion _YYDeviceSystemVersion()
-#endif
-
-#ifndef kiOS12Later
-#define kiOS12Later (kSystemVersion >= 12)
-#endif
-
-
-
 #define kDefaultUndoLevelMax 20 // Default maximum undo level
 
 #define kAutoScrollMinimumDuration 0.1 // Time in seconds to tick auto-scroll.
