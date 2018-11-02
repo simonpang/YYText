@@ -243,13 +243,8 @@ typedef NS_ENUM(NSUInteger, YYTextMoveDirection) {
     [self didChangeValueForKey:@"textLayout"];
     CGSize size = [_innerLayout textBoundingSize];
     CGSize visibleSize = [self _getVisibleSize];
-    if (_innerContainer.isVerticalForm) {
-        size.height = visibleSize.height;
-        if (size.width < visibleSize.width) size.width = visibleSize.width;
-    } else {
-        size.width = visibleSize.width;
-    }
-    
+    size.width = visibleSize.width;
+
     [_containerView setLayout:_innerLayout withFadeDuration:0];
     _containerView.frame = (CGRect){.size = size};
     _state.showingHighlight = NO;
@@ -336,8 +331,7 @@ typedef NS_ENUM(NSUInteger, YYTextMoveDirection) {
 /// Update inner contains's size.
 - (void)_updateInnerContainerSize {
     CGSize size = [self _getVisibleSize];
-    if (_innerContainer.isVerticalForm) size.width = CGFLOAT_MAX;
-    else size.height = CGFLOAT_MAX;
+    size.height = CGFLOAT_MAX;
     _innerContainer.size = size;
 }
 
@@ -380,11 +374,7 @@ typedef NS_ENUM(NSUInteger, YYTextMoveDirection) {
             UIGraphicsEndImageContext();
             _placeHolderView.image = image;
             frame.size = image.size;
-            if (container.isVerticalForm) {
-                frame.origin.x = self.bounds.size.width - image.size.width;
-            } else {
-                frame.origin = CGPointZero;
-            }
+            frame.origin = CGPointZero;
             _placeHolderView.frame = frame;
         }
     }
@@ -462,23 +452,14 @@ typedef NS_ENUM(NSUInteger, YYTextMoveDirection) {
 - (void)_showMagnifierRanged {
     if (YYTextIsAppExtension()) return;
     
-    if (_verticalForm) { // hack for vertical form...
-        [self _showMagnifierCaret];
-        return;
-    }
-    
     if (_state.showingMagnifierCaret) {
         _state.showingMagnifierCaret = NO;
         [[YYTextEffectWindow sharedWindow] hideMagnifier:_magnifierCaret];
     }
     
     CGPoint magPoint = _trackingPoint;
-    if (_verticalForm) {
-        magPoint.x += kMagnifierRangedTrackFix;
-    } else {
-        magPoint.y += kMagnifierRangedTrackFix;
-    }
-    
+    magPoint.y += kMagnifierRangedTrackFix;
+
     YYTextRange *selectedRange = _selectedTextRange;
     if (_state.trackingTouch && _trackingRange) {
         selectedRange = _trackingRange;
@@ -497,30 +478,17 @@ typedef NS_ENUM(NSUInteger, YYTextMoveDirection) {
     if (lineIndex < _innerLayout.lines.count) {
         YYTextLine *line = _innerLayout.lines[lineIndex];
         CGRect lineRect = [self _convertRectFromLayout:line.bounds];
-        if (_verticalForm) {
-            magPoint.x = YYTEXT_CLAMP(magPoint.x, CGRectGetMinX(lineRect), CGRectGetMaxX(lineRect));
-        } else {
-            magPoint.y = YYTEXT_CLAMP(magPoint.y, CGRectGetMinY(lineRect), CGRectGetMaxY(lineRect));
-        }
+        magPoint.y = YYTEXT_CLAMP(magPoint.y, CGRectGetMinY(lineRect), CGRectGetMaxY(lineRect));
         CGPoint linePoint = [_innerLayout linePositionForPosition:position];
         linePoint = [self _convertPointFromLayout:linePoint];
         
         CGPoint popoverPoint = linePoint;
-        if (_verticalForm) {
-            popoverPoint.x = linePoint.x + _magnifierRangedOffset;
-        } else {
-            popoverPoint.y = linePoint.y + _magnifierRangedOffset;
-        }
-        
+        popoverPoint.y = linePoint.y + _magnifierRangedOffset;
+
         CGPoint capturePoint;
-        if (_verticalForm) {
-            capturePoint.x = linePoint.x + kMagnifierRangedCaptureOffset;
-            capturePoint.y = linePoint.y;
-        } else {
-            capturePoint.x = linePoint.x;
-            capturePoint.y = linePoint.y + kMagnifierRangedCaptureOffset;
-        }
-        
+        capturePoint.x = linePoint.x;
+        capturePoint.y = linePoint.y + kMagnifierRangedCaptureOffset;
+
         _magnifierRanged.hostPopoverCenter = popoverPoint;
         _magnifierRanged.hostCaptureCenter = capturePoint;
         if (!_state.showingMagnifierRanged) {
@@ -703,7 +671,7 @@ typedef NS_ENUM(NSUInteger, YYTextMoveDirection) {
     BOOL insetModified = NO;
     YYTextKeyboardManager *mgr = [YYTextKeyboardManager defaultManager];
     
-    if (mgr.keyboardVisible && self.window && self.superview && self.isFirstResponder && !_verticalForm) {
+    if (mgr.keyboardVisible && self.window && self.superview && self.isFirstResponder) {
         CGRect bounds = self.bounds;
         bounds.origin = CGPointZero;
         CGRect kbRect = [mgr convertRect:mgr.keyboardFrame toView:self];
@@ -918,44 +886,23 @@ typedef NS_ENUM(NSUInteger, YYTextMoveDirection) {
         _magnifierRanged.captureDisabled = YES;
         
         CGPoint offset = self.contentOffset;
-        if (_verticalForm) {
-            offset.x += _autoScrollOffset;
-            
-            if (_autoScrollAcceleration > 0) {
-                offset.x += ((_autoScrollOffset > 0 ? 1 : -1) * _autoScrollAcceleration * _autoScrollAcceleration * 0.5);
-            }
-            _autoScrollAcceleration++;
-            offset.x = round(offset.x);
-            if (_autoScrollOffset < 0) {
-                if (offset.x < -self.contentInset.left) offset.x = -self.contentInset.left;
-            } else {
-                CGFloat maxOffsetX = self.contentSize.width - self.bounds.size.width + self.contentInset.right;
-                if (offset.x > maxOffsetX) offset.x = maxOffsetX;
-            }
-            if (offset.x < -self.contentInset.left) offset.x = -self.contentInset.left;
-        } else {
-            offset.y += _autoScrollOffset;
-            if (_autoScrollAcceleration > 0) {
-                offset.y += ((_autoScrollOffset > 0 ? 1 : -1) * _autoScrollAcceleration * _autoScrollAcceleration * 0.5);
-            }
-            _autoScrollAcceleration++;
-            offset.y = round(offset.y);
-            if (_autoScrollOffset < 0) {
-                if (offset.y < -self.contentInset.top) offset.y = -self.contentInset.top;
-            } else {
-                CGFloat maxOffsetY = self.contentSize.height - self.bounds.size.height + self.contentInset.bottom;
-                if (offset.y > maxOffsetY) offset.y = maxOffsetY;
-            }
+        offset.y += _autoScrollOffset;
+        if (_autoScrollAcceleration > 0) {
+            offset.y += ((_autoScrollOffset > 0 ? 1 : -1) * _autoScrollAcceleration * _autoScrollAcceleration * 0.5);
+        }
+        _autoScrollAcceleration++;
+        offset.y = round(offset.y);
+        if (_autoScrollOffset < 0) {
             if (offset.y < -self.contentInset.top) offset.y = -self.contentInset.top;
-        }
-        
-        BOOL shouldScroll;
-        if (_verticalForm) {
-            shouldScroll = fabs(offset.x -self.contentOffset.x) > 0.5;
         } else {
-            shouldScroll = fabs(offset.y -self.contentOffset.y) > 0.5;
+            CGFloat maxOffsetY = self.contentSize.height - self.bounds.size.height + self.contentInset.bottom;
+            if (offset.y > maxOffsetY) offset.y = maxOffsetY;
         }
-        
+        if (offset.y < -self.contentInset.top) offset.y = -self.contentInset.top;
+
+        BOOL shouldScroll;
+        shouldScroll = fabs(offset.y -self.contentOffset.y) > 0.5;
+
         if (shouldScroll) {
             _state.autoScrollTicked = YES;
             _trackingPoint.x += offset.x - self.contentOffset.x;
@@ -1150,22 +1097,13 @@ typedef NS_ENUM(NSUInteger, YYTextMoveDirection) {
 - (CGFloat)_getMagnifierRangedOffset {
     CGPoint magPoint = _trackingPoint;
     magPoint = [self _convertPointToLayout:magPoint];
-    if (_verticalForm) {
-        magPoint.x += kMagnifierRangedTrackFix;
-    } else {
-        magPoint.y += kMagnifierRangedTrackFix;
-    }
+    magPoint.y += kMagnifierRangedTrackFix;
     YYTextPosition *position = [_innerLayout closestPositionToPoint:magPoint];
     NSUInteger lineIndex = [_innerLayout lineIndexForPosition:position];
     if (lineIndex < _innerLayout.lines.count) {
         YYTextLine *line = _innerLayout.lines[lineIndex];
-        if (_verticalForm) {
-            magPoint.x = YYTEXT_CLAMP(magPoint.x, line.left, line.right);
-            return magPoint.x - line.position.x + kMagnifierRangedPopoverOffset;
-        } else {
-            magPoint.y = YYTEXT_CLAMP(magPoint.y, line.top, line.bottom);
-            return magPoint.y - line.position.y + kMagnifierRangedPopoverOffset;
-        }
+        magPoint.y = YYTEXT_CLAMP(magPoint.y, line.top, line.bottom);
+        return magPoint.y - line.position.y + kMagnifierRangedPopoverOffset;
     } else {
         return 0;
     }
@@ -1194,7 +1132,7 @@ typedef NS_ENUM(NSUInteger, YYTextMoveDirection) {
     CGRect bounds = self.bounds;
     bounds.origin = CGPointZero;
     YYTextKeyboardManager *mgr = [YYTextKeyboardManager defaultManager];
-    if (mgr.keyboardVisible && self.window && self.superview && self.isFirstResponder && !_verticalForm) {
+    if (mgr.keyboardVisible && self.window && self.superview && self.isFirstResponder) {
         CGRect kbRect = [mgr convertRect:mgr.keyboardFrame toView:self];
         kbRect.origin.y -= _extraAccessoryViewHeight;
         kbRect.size.height += _extraAccessoryViewHeight;
@@ -1215,22 +1153,12 @@ typedef NS_ENUM(NSUInteger, YYTextMoveDirection) {
     
     CGFloat maxOfs = 32; // a good value ~
     CGFloat ofs = 0;
-    if (_verticalForm) {
-        if (point.x < self.contentInset.left) {
-            ofs = (point.x - self.contentInset.left - 5) * 0.5;
-            if (ofs < -maxOfs) ofs = -maxOfs;
-        } else if (point.x > bounds.size.width) {
-            ofs = ((point.x - bounds.size.width) + 5) * 0.5;
-            if (ofs > maxOfs) ofs = maxOfs;
-        }
-    } else {
-        if (point.y < self.contentInset.top) {
-            ofs = (point.y - self.contentInset.top - 5) * 0.5;
-            if (ofs < -maxOfs) ofs = -maxOfs;
-        } else if (point.y > bounds.size.height) {
-            ofs = ((point.y - bounds.size.height) + 5) * 0.5;
-            if (ofs > maxOfs) ofs = maxOfs;
-        }
+    if (point.y < self.contentInset.top) {
+        ofs = (point.y - self.contentInset.top - 5) * 0.5;
+        if (ofs < -maxOfs) ofs = -maxOfs;
+    } else if (point.y > bounds.size.height) {
+        ofs = ((point.y - bounds.size.height) + 5) * 0.5;
+        if (ofs > maxOfs) ofs = maxOfs;
     }
     return ofs;
 }
@@ -1335,55 +1263,27 @@ typedef NS_ENUM(NSUInteger, YYTextMoveDirection) {
 /// Convert the point from this view to text layout.
 - (CGPoint)_convertPointToLayout:(CGPoint)point {
     CGSize boundingSize = _innerLayout.textBoundingSize;
-    if (_innerLayout.container.isVerticalForm) {
-        CGFloat w = _innerLayout.textBoundingSize.width;
-        if (w < self.bounds.size.width) w = self.bounds.size.width;
-        point.x += _innerLayout.container.size.width - w;
-        if (boundingSize.width < self.bounds.size.width) {
-            if (_textVerticalAlignment == YYTextVerticalAlignmentCenter) {
-                point.x += (self.bounds.size.width - boundingSize.width) * 0.5;
-            } else if (_textVerticalAlignment == YYTextVerticalAlignmentBottom) {
-                point.x += (self.bounds.size.width - boundingSize.width);
-            }
+    if (boundingSize.height < self.bounds.size.height) {
+        if (_textVerticalAlignment == YYTextVerticalAlignmentCenter) {
+            point.y -= (self.bounds.size.height - boundingSize.height) * 0.5;
+        } else if (_textVerticalAlignment == YYTextVerticalAlignmentBottom) {
+            point.y -= (self.bounds.size.height - boundingSize.height);
         }
-        return point;
-    } else {
-        if (boundingSize.height < self.bounds.size.height) {
-            if (_textVerticalAlignment == YYTextVerticalAlignmentCenter) {
-                point.y -= (self.bounds.size.height - boundingSize.height) * 0.5;
-            } else if (_textVerticalAlignment == YYTextVerticalAlignmentBottom) {
-                point.y -= (self.bounds.size.height - boundingSize.height);
-            }
-        }
-        return point;
     }
+    return point;
 }
 
 /// Convert the point from text layout to this view.
 - (CGPoint)_convertPointFromLayout:(CGPoint)point {
     CGSize boundingSize = _innerLayout.textBoundingSize;
-    if (_innerLayout.container.isVerticalForm) {
-        CGFloat w = _innerLayout.textBoundingSize.width;
-        if (w < self.bounds.size.width) w = self.bounds.size.width;
-        point.x -= _innerLayout.container.size.width - w;
-        if (boundingSize.width < self.bounds.size.width) {
-            if (_textVerticalAlignment == YYTextVerticalAlignmentCenter) {
-                point.x -= (self.bounds.size.width - boundingSize.width) * 0.5;
-            } else if (_textVerticalAlignment == YYTextVerticalAlignmentBottom) {
-                point.x -= (self.bounds.size.width - boundingSize.width);
-            }
+    if (boundingSize.height < self.bounds.size.height) {
+        if (_textVerticalAlignment == YYTextVerticalAlignmentCenter) {
+            point.y += (self.bounds.size.height - boundingSize.height) * 0.5;
+        } else if (_textVerticalAlignment == YYTextVerticalAlignmentBottom) {
+            point.y += (self.bounds.size.height - boundingSize.height);
         }
-        return point;
-    } else {
-        if (boundingSize.height < self.bounds.size.height) {
-            if (_textVerticalAlignment == YYTextVerticalAlignmentCenter) {
-                point.y += (self.bounds.size.height - boundingSize.height) * 0.5;
-            } else if (_textVerticalAlignment == YYTextVerticalAlignmentBottom) {
-                point.y += (self.bounds.size.height - boundingSize.height);
-            }
-        }
-        return point;
     }
+    return point;
 }
 
 /// Convert the rect from this view to text layout.
@@ -1864,13 +1764,6 @@ typedef NS_ENUM(NSUInteger, YYTextMoveDirection) {
     [self didChangeValueForKey:@"exclusionPaths"];
 }
 
-- (void)_setVerticalForm:(BOOL)verticalForm {
-    if (_verticalForm == verticalForm) return;
-    [self willChangeValueForKey:@"verticalForm"];
-    _verticalForm = verticalForm;
-    [self didChangeValueForKey:@"verticalForm"];
-}
-
 - (void)_setLinePositionModifier:(id<YYTextLinePositionModifier>)linePositionModifier {
     if (_linePositionModifier == linePositionModifier) return;
     [self willChangeValueForKey:@"linePositionModifier"];
@@ -2174,44 +2067,6 @@ typedef NS_ENUM(NSUInteger, YYTextMoveDirection) {
     if (_exclusionPaths == exclusionPaths || [_exclusionPaths isEqual:exclusionPaths]) return;
     [self _setExclusionPaths:exclusionPaths];
     _innerContainer.exclusionPaths = exclusionPaths;
-    if (_innerContainer.isVerticalForm) {
-        CGAffineTransform trans = CGAffineTransformMakeTranslation(_innerContainer.size.width - self.bounds.size.width, 0);
-        [_innerContainer.exclusionPaths enumerateObjectsUsingBlock:^(UIBezierPath *path, NSUInteger idx, BOOL *stop) {
-            [path applyTransform:trans];
-        }];
-    }
-    [self _commitUpdate];
-}
-
-- (void)setVerticalForm:(BOOL)verticalForm {
-    if (_verticalForm == verticalForm) return;
-    [self _setVerticalForm:verticalForm];
-    _innerContainer.verticalForm = verticalForm;
-    _selectionView.verticalForm = verticalForm;
-    
-    [self _updateInnerContainerSize];
-    
-    if (verticalForm) {
-        if (UIEdgeInsetsEqualToEdgeInsets(_innerContainer.insets, kDefaultInset)) {
-            _innerContainer.insets = kDefaultVerticalInset;
-            [self _setTextContainerInset:kDefaultVerticalInset];
-        }
-    } else {
-        if (UIEdgeInsetsEqualToEdgeInsets(_innerContainer.insets, kDefaultVerticalInset)) {
-            _innerContainer.insets = kDefaultInset;
-            [self _setTextContainerInset:kDefaultInset];
-        }
-    }
-    
-    _innerContainer.exclusionPaths = _exclusionPaths;
-    if (verticalForm) {
-        CGAffineTransform trans = CGAffineTransformMakeTranslation(_innerContainer.size.width - self.bounds.size.width, 0);
-        [_innerContainer.exclusionPaths enumerateObjectsUsingBlock:^(UIBezierPath *path, NSUInteger idx, BOOL *stop) {
-            [path applyTransform:trans];
-        }];
-    }
-    
-    [self _keyboardChanged];
     [self _commitUpdate];
 }
 
@@ -2377,7 +2232,7 @@ typedef NS_ENUM(NSUInteger, YYTextMoveDirection) {
     CGSize oldSize = self.bounds.size;
     [super setFrame:frame];
     CGSize newSize = self.bounds.size;
-    BOOL changed = _innerContainer.isVerticalForm ? (oldSize.height != newSize.height) : (oldSize.width != newSize.width);
+    BOOL changed = (oldSize.width != newSize.width);
     if (changed) {
         [self _updateInnerContainerSize];
         [self _commitUpdate];
@@ -2391,7 +2246,7 @@ typedef NS_ENUM(NSUInteger, YYTextMoveDirection) {
     CGSize oldSize = self.bounds.size;
     [super setBounds:bounds];
     CGSize newSize = self.bounds.size;
-    BOOL changed = _innerContainer.isVerticalForm ? (oldSize.height != newSize.height) : (oldSize.width != newSize.width);
+    BOOL changed = (oldSize.width != newSize.width);
     if (changed) {
         [self _updateInnerContainerSize];
         [self _commitUpdate];
@@ -2426,29 +2281,17 @@ typedef NS_ENUM(NSUInteger, YYTextMoveDirection) {
 }
 
 - (CGSize)sizeThatFits:(CGSize)size {
-    if (!_verticalForm && size.width <= 0) size.width = YYTextContainerMaxSize.width;
-    if (_verticalForm && size.height <= 0) size.height = YYTextContainerMaxSize.height;
-    
-    if ((!_verticalForm && size.width == self.bounds.size.width) ||
-        (_verticalForm && size.height == self.bounds.size.height)) {
+    if (size.width <= 0) size.width = YYTextContainerMaxSize.width;
+
+    if (size.width == self.bounds.size.width) {
         [self _updateIfNeeded];
-        if (!_verticalForm) {
-            if (_containerView.bounds.size.height <= size.height) {
-                return _containerView.bounds.size;
-            }
-        } else {
-            if (_containerView.bounds.size.width <= size.width) {
-                return _containerView.bounds.size;
-            }
+        if (_containerView.bounds.size.height <= size.height) {
+            return _containerView.bounds.size;
         }
     }
     
-    if (!_verticalForm) {
-        size.height = YYTextContainerMaxSize.height;
-    } else {
-        size.width = YYTextContainerMaxSize.width;
-    }
-    
+    size.height = YYTextContainerMaxSize.height;
+
     YYTextContainer *container = [_innerContainer copy];
     container.size = size;
     
@@ -2550,14 +2393,8 @@ typedef NS_ENUM(NSUInteger, YYTextMoveDirection) {
                 if (_state.trackingCaret || _state.touchMoved) {
                     _state.trackingCaret = YES;
                     [self _hideMenu];
-                    if (_verticalForm) {
-                        if (_state.touchMoved == kTop || _state.touchMoved == kBottom) {
-                            self.panGestureRecognizer.enabled = NO;
-                        }
-                    } else {
-                        if (_state.touchMoved == kLeft || _state.touchMoved == kRight) {
-                            self.panGestureRecognizer.enabled = NO;
-                        }
+                    if (_state.touchMoved == kLeft || _state.touchMoved == kRight) {
+                        self.panGestureRecognizer.enabled = NO;
                     }
                     [self _updateTextRangeByTrackingCaret];
                     if (_markedTextRange) {
@@ -3019,7 +2856,6 @@ typedef NS_ENUM(NSUInteger, YYTextMoveDirection) {
             @"textVerticalAlignment",
             @"textContainerInset",
             @"exclusionPaths",
-            @"verticalForm",
             @"linePositionModifier",
             @"selectedRange",
             @"typingAttributes"
@@ -3042,7 +2878,6 @@ typedef NS_ENUM(NSUInteger, YYTextMoveDirection) {
     self.dataDetectorTypes = [aDecoder decodeIntegerForKey:@"dataDetectorTypes"];
     self.textContainerInset = ((NSValue *)[aDecoder decodeObjectForKey:@"textContainerInset"]).UIEdgeInsetsValue;
     self.exclusionPaths = [aDecoder decodeObjectForKey:@"exclusionPaths"];
-    self.verticalForm = [aDecoder decodeBoolForKey:@"verticalForm"];
     return self;
 }
 
@@ -3054,7 +2889,6 @@ typedef NS_ENUM(NSUInteger, YYTextMoveDirection) {
     [aCoder encodeInteger:self.dataDetectorTypes forKey:@"dataDetectorTypes"];
     [aCoder encodeUIEdgeInsets:self.textContainerInset forKey:@"textContainerInset"];
     [aCoder encodeObject:self.exclusionPaths forKey:@"exclusionPaths"];
-    [aCoder encodeBool:self.verticalForm forKey:@"verticalForm"];
 }
 
 #pragma mark - @protocol UIScrollViewDelegate
@@ -3481,11 +3315,7 @@ typedef NS_ENUM(NSUInteger, YYTextMoveDirection) {
     YYTextRange *range = [_innerLayout textRangeByExtendingPosition:position inDirection:direction offset:offset];
     
     BOOL forward;
-    if (_innerContainer.isVerticalForm) {
-        forward = direction == UITextLayoutDirectionLeft || direction == UITextLayoutDirectionDown;
-    } else {
-        forward = direction == UITextLayoutDirectionDown || direction == UITextLayoutDirectionRight;
-    }
+    forward = direction == UITextLayoutDirectionDown || direction == UITextLayoutDirectionRight;
     if (!forward && offset < 0) {
         forward = -forward;
     }
@@ -3565,26 +3395,14 @@ typedef NS_ENUM(NSUInteger, YYTextMoveDirection) {
     if (!CGRectIsNull(caretRect)) {
         caretRect = [self _convertRectFromLayout:caretRect];
         caretRect = CGRectStandardize(caretRect);
-        if (_verticalForm) {
-            if (caretRect.size.height == 0) {
-                caretRect.size.height = 2;
-                caretRect.origin.y -= 2 * 0.5;
-            }
-            if (caretRect.origin.y < 0) {
-                caretRect.origin.y = 0;
-            } else if (caretRect.origin.y + caretRect.size.height > self.bounds.size.height) {
-                caretRect.origin.y = self.bounds.size.height - caretRect.size.height;
-            }
-        } else {
-            if (caretRect.size.width == 0) {
-                caretRect.size.width = 2;
-                caretRect.origin.x -= 2 * 0.5;
-            }
-            if (caretRect.origin.x < 0) {
-                caretRect.origin.x = 0;
-            } else if (caretRect.origin.x + caretRect.size.width > self.bounds.size.width) {
-                caretRect.origin.x = self.bounds.size.width - caretRect.size.width;
-            }
+        if (caretRect.size.width == 0) {
+            caretRect.size.width = 2;
+            caretRect.origin.x -= 2 * 0.5;
+        }
+        if (caretRect.origin.x < 0) {
+            caretRect.origin.x = 0;
+        } else if (caretRect.origin.x + caretRect.size.width > self.bounds.size.width) {
+            caretRect.origin.x = self.bounds.size.width - caretRect.size.width;
         }
         return YYTextCGRectPixelRound(caretRect);
     }

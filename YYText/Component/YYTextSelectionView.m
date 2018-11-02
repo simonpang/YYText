@@ -200,37 +200,16 @@
     }
 }
 
-- (void)setVerticalForm:(BOOL)verticalForm {
-    if (_verticalForm != verticalForm) {
-        _verticalForm = verticalForm;
-        [self setCaretRect:_caretRect];
-        self.startGrabber.dotDirection = verticalForm ? YYTextDirectionRight : YYTextDirectionTop;
-        self.endGrabber.dotDirection = verticalForm ? YYTextDirectionLeft : YYTextDirectionBottom;
-    }
-}
-
 - (CGRect)_standardCaretRect:(CGRect)caretRect {
     caretRect = CGRectStandardize(caretRect);
-    if (_verticalForm) {
-        if (caretRect.size.height == 0) {
-            caretRect.size.height = kLineWidth;
-            caretRect.origin.y -= kLineWidth * 0.5;
-        }
-        if (caretRect.origin.y < 0) {
-            caretRect.origin.y = 0;
-        } else if (caretRect.origin.y + caretRect.size.height > self.bounds.size.height) {
-            caretRect.origin.y = self.bounds.size.height - caretRect.size.height;
-        }
-    } else {
-        if (caretRect.size.width == 0) {
-            caretRect.size.width = kLineWidth;
-            caretRect.origin.x -= kLineWidth * 0.5;
-        }
-        if (caretRect.origin.x < 0) {
-            caretRect.origin.x = 0;
-        } else if (caretRect.origin.x + caretRect.size.width > self.bounds.size.width) {
-            caretRect.origin.x = self.bounds.size.width - caretRect.size.width;
-        }
+    if (caretRect.size.width == 0) {
+        caretRect.size.width = kLineWidth;
+        caretRect.origin.x -= kLineWidth * 0.5;
+    }
+    if (caretRect.origin.x < 0) {
+        caretRect.origin.x = 0;
+    } else if (caretRect.origin.x + caretRect.size.width > self.bounds.size.width) {
+        caretRect.origin.x = self.bounds.size.width - caretRect.size.width;
     }
     caretRect = YYTextCGRectPixelRound(caretRect);
     if (isnan(caretRect.origin.x) || isinf(caretRect.origin.x)) caretRect.origin.x = 0;

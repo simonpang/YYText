@@ -220,12 +220,6 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nullable, nonatomic, copy) NSArray<UIBezierPath *> *exclusionPaths;
 
 /**
- Whether the receiver's layout orientation is vertical form. Default is NO.
- It may used to edit/display CJK text.
- */
-@property (nonatomic, getter=isVerticalForm) BOOL verticalForm;
-
-/**
  The text line position modifier used to modify the lines' position in layout.
  See `YYTextLinePositionModifier` protocol for more information.
  */

@@ -58,7 +58,6 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nullable, nonatomic, strong) UIColor *color; ///< the tint color
 @property (nonatomic, getter = isCaretBlinks) BOOL caretBlinks; ///< whether the caret is blinks
 @property (nonatomic, getter = isCaretVisible) BOOL caretVisible; ///< whether the caret is visible
-@property (nonatomic, getter = isVerticalForm) BOOL verticalForm; ///< weather the text view is vertical form
 
 @property (nonatomic) CGRect caretRect; ///< caret rect (width==0 or height==0)
 @property (nullable, nonatomic, copy) NSArray<YYTextSelectionRect *> *selectionRects; ///< default is nil

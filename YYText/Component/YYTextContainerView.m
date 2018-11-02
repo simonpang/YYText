@@ -87,17 +87,9 @@
     CGSize boundingSize = _layout.textBoundingSize;
     CGPoint point = CGPointZero;
     if (_textVerticalAlignment == YYTextVerticalAlignmentCenter) {
-        if (_layout.container.isVerticalForm) {
-            point.x = -(self.bounds.size.width - boundingSize.width) * 0.5;
-        } else {
-            point.y = (self.bounds.size.height - boundingSize.height) * 0.5;
-        }
+        point.y = (self.bounds.size.height - boundingSize.height) * 0.5;
     } else if (_textVerticalAlignment == YYTextVerticalAlignmentBottom) {
-        if (_layout.container.isVerticalForm) {
-            point.x = -(self.bounds.size.width - boundingSize.width);
-        } else {
-            point.y = (self.bounds.size.height - boundingSize.height);
-        }
+        point.y = (self.bounds.size.height - boundingSize.height);
     }
     [_layout drawInContext:UIGraphicsGetCurrentContext() size:self.bounds.size point:point view:self layer:self.layer debug:_debugOption cancel:nil];
     

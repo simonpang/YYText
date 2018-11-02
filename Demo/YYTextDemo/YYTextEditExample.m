@@ -98,7 +98,6 @@
             _self.exclusionSwitch.on = NO;
         }
         _self.exclusionSwitch.enabled = !switcher.isOn;
-        _self.textView.verticalForm = switcher.isOn; /// Set vertical form
     }];
     if ([toolbar isKindOfClass:[UIVisualEffectView class]]) {
         UIVisualEffectView *toolVisualEffectiView = (UIVisualEffectView *)toolbar;
@@ -233,16 +232,6 @@
 
 - (void)keyboardChangedWithTransition:(YYTextKeyboardTransition)transition {
     BOOL clipped = NO;
-    if (_textView.isVerticalForm && transition.toVisible) {
-        CGRect rect = [[YYTextKeyboardManager defaultManager] convertRect:transition.toFrame toView:self.view];
-        if (CGRectGetMaxY(rect) == self.view.height) {
-            CGRect textFrame = self.view.bounds;
-            textFrame.size.height -= rect.size.height;
-            _textView.frame = textFrame;
-            clipped = YES;
-        }
-    }
-    
     if (!clipped) {
         _textView.frame = self.view.bounds;
     }

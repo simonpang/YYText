@@ -87,9 +87,6 @@ extern const CGSize YYTextContainerMaxSize;
 /// Default is YES;
 @property (getter=isPathFillEvenOdd) BOOL pathFillEvenOdd;
 
-/// Whether the text is vertical form (may used for CJK text layout). Default is NO.
-@property (getter=isVerticalForm) BOOL verticalForm;
-
 /// Maximum number of rows, 0 means no limit. Default is 0.
 @property NSUInteger maximumNumberOfRows;
 
